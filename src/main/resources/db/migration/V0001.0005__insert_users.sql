@@ -1,0 +1,17 @@
+-- developer and admins
+INSERT INTO "user"(email, user_name)
+	VALUES ('manuel.hennig@vsaoffice365.onmicrosoft.com', 'Manuel Hennig');
+INSERT INTO "user"(email, user_name)
+	VALUES ('janina.knecht@vsaoffice365.onmicrosoft.com', 'Janina Knecht');
+INSERT INTO "user"(email, user_name)
+	VALUES ('veit.sanner@vsaoffice365.onmicrosoft.com', 'Veit Sanner');
+INSERT INTO "user"(email, user_name)
+	VALUES ('barbara.reich@vsaoffice365.onmicrosoft.com', 'Barbara Reich');
+INSERT INTO "user"(email, user_name)
+	VALUES ('dragos.nitescu@vsaoffice365.onmicrosoft.com', 'Dragos Nitescu');
+INSERT INTO "user"(email, user_name)
+	VALUES ('marius.cornaciu@vsaoffice365.onmicrosoft.com', 'Marius Cornaciu');
+INSERT INTO "user"(email, user_name)
+	VALUES ('shahin.tahirov@vsaoffice365.onmicrosoft.com', 'Shahin Tahirov');
+INSERT INTO "user"(email, user_name)
+	VALUES ('stefany.greiner@vsaoffice365.onmicrosoft.com', 'Stefany Greiner');

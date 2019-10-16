@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iot-api-projects-deployment
+  namespace: iot
+  annotations:
+    kubernetes.io/change-cause: "iot-api-projects:${BUILD_TIMESTAMP}"
+  labels:
+    app: iot-api-projects
+    version: v1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: iot-api-projects
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: iot-api-projects
+        version: v1
+    spec:
+      containers:
+      - name: iot-api-projects
+        image: registry.eu-de.bluemix.net/ht-iot/iot-api-projects:${BUILD_TIMESTAMP}
+        ports:
+        - name: http
+          containerPort: 8080
+        resources:
+          limits:
+            cpu: "512m"
+            memory: "512Mi"
+        env:
+          - name: SPRING_PROFILES_ACTIVE
+            value: ${SPRING_PROFILE}
+          - name: INFO_APP_VERSION
+            value: iot-api-projects:${BUILD_TIMESTAMP}
+          - name: SPRING_DATASOURCE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: iot-api-projects
+                key: postgres.password
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 9090
+          initialDelaySeconds: 60
+          failureThreshold: 3
+          timeoutSeconds: 1
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 9090
+          initialDelaySeconds: 60
+          failureThreshold: 3
+          timeoutSeconds: 1
+          periodSeconds: 10
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: iot-api-projects
+  namespace: iot
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: iot-api-projects-deployment
+  minReplicas: 1
+  maxReplicas: 4
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 75
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: iot-api-projects-service
+  namespace: iot
+spec:
+  selector:
+    app: iot-api-projects
+    version: v1
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: http
+  type: ClusterIP

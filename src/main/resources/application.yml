@@ -1,0 +1,115 @@
+# profile common
+enable-azure-ad: true
+rtmt:
+  progress:
+    url: http://iot-api-projects-service:80
+server:
+  servlet:
+    context-path: /api
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      connectionTestQuery: SELECT 1 FROM USER
+      minimumIdle: 1
+      maximumPoolSize: 20
+      poolName: SpringBootJPAHikariCP
+      leakDetectionThreshold: 60000
+      maxLifetime: 300000  # 5 minutes
+    
+  jpa:
+    hibernate:
+      connection.pool_size: 10
+      ddl-auto: none
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+      open-in-view: false
+      show_sql: true
+      default_schema: projects
+    properties.hibernate.generate_statistics: false
+
+    # LobCreatorBuilderImpl : HHH000424: Disabling contextual LOB creation as createClob() method threw error
+    # see: http://vkuzel.blogspot.de/2016/03/spring-boot-jpa-hibernate-atomikos.html
+    # Disable feature detection by this undocumented parameter. Check the org.hibernate.engine.jdbc.internal.JdbcServiceImpl.configure method for more details.
+    properties.hibernate.temp.use_jdbc_metadata_defaults: false
+    show-sql: false
+
+#       javax:
+#         cache:
+#           provider: org.ehcache.jsr107.EhcacheCachingProvider
+#           missing_cache_strategy: create
+  flyway:
+    enabled: true
+    schemas:
+      - projects
+    baseline-on-migrate: true
+      
+info:
+  app:
+    name: Opera IoT Projects REST API
+    description: Opera IoT Projects REST API
+    version: 0.1
+---
+# profile ibmcloud-dev
+logging:
+  level:
+    root: INFO
+    org.hibernate.stat: DEBUG
+    com.opera.iotapisensors: DEBUG
+spring:
+  profiles: ibmcloud-dev
+  datasource:
+    username: projects_svc
+    password: enter_password
+    url: jdbc:postgresql://f07dfcd0-5890-4ea5-a072-fc03498278f7.659dc287bad647f9b4fe17c4e4c38dcc.databases.appdomain.cloud:30231/ibmclouddb
+  jpa:
+    properties.hibernate.generate_statistics: false
+    show-sql: true
+  security:
+    oauth2:
+      client:
+        provider:
+          azuread:
+            issuer-uri: https://login.microsoftonline.com/28de3153-71b5-4125-be0d-88885d2e44fa/v2.0
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://login.microsoftonline.com/28de3153-71b5-4125-be0d-88885d2e44fa/discovery/v2.0/keys
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+        - health
+        - info
+  server:
+    port: 9090
+---
+# profile ibmcloud-poc
+spring:
+  profiles: ibmcloud-poc
+  datasource:
+    username: projects_svc
+    password: enter_password
+    url: jdbc:postgresql://527c1a7b-7745-487b-84bd-924d1acb4d17.659dc287bad647f9b4fe17c4e4c38dcc.databases.appdomain.cloud:32323/ibmclouddb
+  jpa:
+    properties.hibernate.generate_statistics: false
+    show-sql: false
+  security:
+    oauth2:
+      client:
+        provider:
+          azuread:
+            issuer-uri: https://login.microsoftonline.com/ad4cb6df-6b71-4c1d-b540-bd56be265142/v2.0
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://login.microsoftonline.com/ad4cb6df-6b71-4c1d-b540-bd56be265142/discovery/v2.0/keys
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+        - health
+  server:
+    port: 9090
+        
